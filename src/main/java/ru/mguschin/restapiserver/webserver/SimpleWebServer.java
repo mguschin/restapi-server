@@ -43,27 +43,27 @@ public class SimpleWebServer {
         }
 
         public String getMethod() {
-            return this.method;
+            return method;
         }
 
         public String getRequestURI() {
-            return this.requestURI;
+            return requestURI;
         }
 
         public String getVersion() {
-            return this.version;
+            return version;
         }
 
         public String[] getHeaders() {
-            return this.headers;
+            return headers;
         }
 
         public String getMessageBody() {
-            return this.messageBody;
+            return messageBody;
         }
 
         public void setHeaders(String[] headers) {
-            this.headers = headers;
+            headers = headers;
         }
 
         public void setMessageBody(String messageBody) {
