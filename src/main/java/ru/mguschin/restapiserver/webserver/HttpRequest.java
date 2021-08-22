@@ -7,20 +7,22 @@ import java.util.StringTokenizer;
 import java.util.Map;
 import java.util.HashMap;
 
-class HTTPRequest {
-    private String method;
+class HttpRequest {
+    private HttpMethod method;
     private String requestURI;
     private String version;
-    private Map<String, String> headers = new HashMap<>();;
+    private Map<String, String> headers;
     private String messageBody;
 
-    public HTTPRequest(String method, String requestURI, String version) {
+    public HttpRequest(HttpMethod method, String requestURI, String version) {
         this.method = method;
         this.requestURI = requestURI;
         this.version = version;
+
+        headers = new HashMap<>();
     }
 
-    public String getMethod() {
+    public HttpMethod getMethod() {
         return method;
     }
 
@@ -47,8 +49,6 @@ class HTTPRequest {
     public String getMessageBody() {
         return messageBody;
     }
-
-
 
     public void setMessageBody(String messageBody) {
         this.messageBody = messageBody;

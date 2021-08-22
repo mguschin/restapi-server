@@ -30,7 +30,7 @@ public class SimpleWebServer {
             logger.info("Listening for connections on port: " + listenPort);
 
             while (true) {
-                pool.execute(new HTTPWorker(socket.accept()));
+                pool.execute(new HttpWorker(socket.accept()));
             }
         } catch (IOException e) {
             logger.error("Connection error : " + e.getMessage());
