@@ -1,4 +1,4 @@
-package ru.mguschin.restapiserver.webserver;
+package ru.mguschin.restapiserver.web;
 
 import java.util.HashMap;
 import java.util.Map;

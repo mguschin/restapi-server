@@ -2,7 +2,7 @@ package ru.mguschin.restapiserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.mguschin.restapiserver.webserver.SimpleWebServer;
+import ru.mguschin.restapiserver.web.SimpleWebServer;
 
 public class RestAPIServerApplication {
 
@@ -11,8 +11,8 @@ public class RestAPIServerApplication {
     public static void main(String[] args) {
 
         final int DEFAULT_LISTEN_PORT = 8080;
-        final int DEFAULT_MIN_WORKERS = 10;
-        final int DEFAULT_MAX_WORKERS = 10;
+        final int DEFAULT_MIN_WORKERS = 5;
+        final int DEFAULT_MAX_WORKERS = 20;
 
         int listenPort = 0;
 

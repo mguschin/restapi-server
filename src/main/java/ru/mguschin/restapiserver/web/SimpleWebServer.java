@@ -1,4 +1,4 @@
-package ru.mguschin.restapiserver.webserver;
+package ru.mguschin.restapiserver.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,17 +10,23 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import ru.mguschin.restapiserver.controller.RegistrationController;
+
 public class SimpleWebServer {
     private static final Logger logger = LoggerFactory.getLogger(SimpleWebServer.class);
-
+    //private final RequestMap requestMap;
     private final int KEEPALIVE_TIME = 10;
 
     private final ExecutorService pool;
     private final int listenPort;
 
+
     public SimpleWebServer(int port, int minWorkers, int maxWorkers) {
         listenPort = port;
         pool = new ThreadPoolExecutor(minWorkers, maxWorkers, KEEPALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingDeque<>());
+
+        //requestMap = RequestMap.getInstance();
+        //requestMap.addMapping("/register", (r) -> RegistrationController.register(r));
     }
 
     public void start () {

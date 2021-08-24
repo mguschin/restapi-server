@@ -1,28 +1,33 @@
-package ru.mguschin.restapiserver.webserver;
+package ru.mguschin.restapiserver.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.Set;
 import java.util.Map;
 import java.util.EnumSet;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
+
+import ru.mguschin.restapiserver.controller.*;
 
 class HttpWorker implements Runnable {
-    private static final Logger logger = LoggerFactory.getLogger(SimpleWebServer.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpWorker.class);
     private final String SERVER_NAME = "SimpleWebServer/0.1";
     private final Set<HttpMethod> SUPPORTED_METHODS = EnumSet.of(HttpMethod.GET, HttpMethod.PUT, HttpMethod.POST, HttpMethod.DELETE);
     private final Socket socket;
+    //private final RequestMap requestMap;
 
     public HttpWorker(Socket s) {
         socket = s;
+        //requestMap = RequestMap.getInstance();
     }
 
     private void respond (PrintWriter out, HttpResponse response) {
+        logger.debug("Response: " + response.getStatusLine());
+
         out.println(response.getStatusLine());
         out.println("Server: " + SERVER_NAME);
 
@@ -48,7 +53,6 @@ class HttpWorker implements Runnable {
         logger.info("Accepted connection.");
 
         HttpRequest request = null;
-        boolean bodyExpected = false;
 
         try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              PrintWriter out = new PrintWriter(socket.getOutputStream());
@@ -57,8 +61,14 @@ class HttpWorker implements Runnable {
             logger.debug("Request header:");
 
             // parsing header
-
             String line = in.readLine();
+
+            if (line == null) {
+                logger.debug("No data received. Closing connection.");
+
+                return;
+            }
+
             logger.debug(line);
 
             StringTokenizer parse = new StringTokenizer(line);
@@ -84,10 +94,6 @@ class HttpWorker implements Runnable {
                 return;
             }
 
-            if (!request.getMethod().equals(HttpMethod.GET)) {
-                bodyExpected = true;
-            }
-
             // parsing body
             StringBuilder requestBody = new StringBuilder();
             int bodyLen = 0;
@@ -106,11 +112,6 @@ class HttpWorker implements Runnable {
                 }
             } else if (request.getHeader("Content-Type") != null && request.getHeader("Content-Type").startsWith("multipart")) {
                 respond(out, new HttpResponse(HttpStatus.NOT_IMPLEMENTED));
-                return;
-            }
-
-            if (bodyExpected && bodyLen == 0) {
-                respond(out, new HttpResponse(HttpStatus.BAD_REQUEST));
                 return;
             }
 
@@ -134,20 +135,34 @@ class HttpWorker implements Runnable {
                 request.setMessageBody(requestBody.toString());
             }
 
-            if (request.getMethod().equals(HttpMethod.GET)) {
-                respond(out, new HttpResponse(HttpStatus.OK) {{
-                    addHeader("Content-type", "text/html");
-                    setMessageBody("<html><head><title>200 Ok</title></head><body><h1>200 Ok</h1><p>Server is running.</p></body></html>");
-                }});
-                return;
+            //Function<HttpRequest, HttpResponse> controller = requestMap.matchRequest(request);
+            HttpResponse response;
 
-            } else if (request.getMethod().equals(HttpMethod.POST)) {
-                respond(out, new HttpResponse(HttpStatus.CREATED));
-                return;
-            } else {
-                respond(out, new HttpResponse(HttpStatus.NOT_IMPLEMENTED));
-                return;
+            Pattern urlPattern = Pattern.compile("^/client/[a-zA-Z0-9_%+-]+/balance$");
+
+            try {
+                if (request.getRequestURI().equals("/register")) {
+                    RegistrationController c = new RegistrationController();
+                    response = c.register(request);
+                } else if (urlPattern.matcher(request.getRequestURI()).matches()) {
+                    BalanceController c = new BalanceController();
+                    response = c.balance(request);
+                } else {
+                    response = new HttpResponse(HttpStatus.NOT_FOUND);
+                    response.addHeader("Content-type", "text/html");
+                    response.setMessageBody("<html><head><title>" + HttpStatus.NOT_FOUND + "</title></head><body><h1>" + HttpStatus.NOT_FOUND + "</h1><p>The requested path was not mapped to any application.</p></body></html>");
+                }
+            } catch (Exception e){
+                logger.error("Controller error: " + e.getMessage());
+
+                response = new HttpResponse(HttpStatus.INTERNAL_SERVER_ERROR);
+                response.addHeader("Content-type", "text/html");
+                response.setMessageBody("<html><head><title>" + HttpStatus.INTERNAL_SERVER_ERROR + "</title></head><body><h1>" + HttpStatus.INTERNAL_SERVER_ERROR + "</h1><p>The requested path was not mapped to any application.</p></body></html>");
             }
+
+            respond(out, response);
+
+            return;
         } catch (IOException e) {
             logger.error("IO error : " + e);
         }

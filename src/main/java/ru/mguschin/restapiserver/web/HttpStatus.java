@@ -1,4 +1,4 @@
-package ru.mguschin.restapiserver.webserver;
+package ru.mguschin.restapiserver.web;
 
 public enum HttpStatus {
     OK(200, "OK"),

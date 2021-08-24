@@ -1,42 +1,33 @@
-package ru.mguschin.restapiserver.webserver;
+package ru.mguschin.restapiserver.web;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
 
-class HttpResponse {
+public class HttpRequest {
+    private HttpMethod method;
+    private String requestURI;
     private String version;
-    private HttpStatus status;
     private Map<String, String> headers;
     private String messageBody;
 
-    public HttpResponse(String version, HttpStatus status) {
+    public HttpRequest(HttpMethod method, String requestURI, String version) {
+        this.method = method;
+        this.requestURI = requestURI;
         this.version = version;
-        this.status = status;
 
         headers = new HashMap<>();
     }
-    public HttpResponse(HttpStatus status) {
-        this("HTTP/1.1", status);
+
+    public HttpMethod getMethod() {
+        return method;
+    }
+
+    public String getRequestURI() {
+        return requestURI;
     }
 
     public String getVersion() {
         return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public HttpStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(HttpStatus status) {
-        this.status = status;
-    }
-
-    public String getStatusLine () {
-        return version + " " + status;
     }
 
     public Map<String, String> getAllHeaders() {
