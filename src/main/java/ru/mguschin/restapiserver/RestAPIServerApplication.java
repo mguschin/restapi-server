@@ -3,6 +3,9 @@ package ru.mguschin.restapiserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mguschin.restapiserver.web.SimpleWebServer;
+import ru.mguschin.restapiserver.service.DataSource;
+import java.sql.*;
+import org.postgresql.util.PSQLState;
 
 public class RestAPIServerApplication {
 
@@ -35,6 +38,17 @@ public class RestAPIServerApplication {
             default: listenPort = DEFAULT_LISTEN_PORT;
                      logger.warn("Invalid parameters. Using default port: {}", DEFAULT_LISTEN_PORT);
                      break;
+        }
+
+        logger.info("Checking DB connection ...");
+
+        try (Connection con = DataSource.getConnection();) {
+            logger.info("Connection successful!");
+        } catch (Throwable e) {
+            System.out.println("DB connection failed: " + e.getCause());
+            logger.error("Connection failed: " + e.getCause());
+
+            System.exit(2);
         }
 
         logger.info("Starting REST API Server ...");

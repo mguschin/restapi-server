@@ -50,7 +50,7 @@ class HttpWorker implements Runnable {
 
     @Override
     public void run() {
-        logger.info("Accepted connection.");
+        logger.info("Accepted connection from " + socket.getInetAddress().getHostAddress());
 
         HttpRequest request = null;
 
@@ -58,13 +58,11 @@ class HttpWorker implements Runnable {
              PrintWriter out = new PrintWriter(socket.getOutputStream());
              BufferedOutputStream dataOut = new BufferedOutputStream(socket.getOutputStream());) {
 
-            logger.debug("Request header:");
-
             // parsing header
             String line = in.readLine();
 
             if (line == null) {
-                logger.debug("No data received. Closing connection.");
+                logger.warn("No data received. Closing connection.");
 
                 return;
             }
@@ -129,22 +127,20 @@ class HttpWorker implements Runnable {
                     logger.error("Message body size mismatch: expected {} got {}", bodyLen, requestBody.length());
                 }
 
-                logger.debug("Request body: " + requestBody.toString());
-                logger.debug("Request length: " + requestBody.length());
+                logger.debug("Message body: " + requestBody.toString());
+                logger.debug("Body length: " + requestBody.length());
 
                 request.setMessageBody(requestBody.toString());
             }
 
-            //Function<HttpRequest, HttpResponse> controller = requestMap.matchRequest(request);
             HttpResponse response;
 
-            Pattern urlPattern = Pattern.compile("^/client/[a-zA-Z0-9_%+-]+/balance$");
-
             try {
+                // passing request to API controllers
                 if (request.getRequestURI().equals("/register")) {
                     RegistrationController c = new RegistrationController();
                     response = c.register(request);
-                } else if (urlPattern.matcher(request.getRequestURI()).matches()) {
+                } else if (request.getRequestURI().matches("^/client/[a-zA-Z0-9_\\.+-]+/balance$")) {
                     BalanceController c = new BalanceController();
                     response = c.balance(request);
                 } else {
