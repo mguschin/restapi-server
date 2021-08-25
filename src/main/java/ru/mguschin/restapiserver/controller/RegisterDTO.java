@@ -1,7 +1,5 @@
 package ru.mguschin.restapiserver.controller;
 
-import java.math.BigDecimal;
-
 public class RegisterDTO {
     private String login;
     private String token;

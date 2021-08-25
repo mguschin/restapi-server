@@ -14,7 +14,6 @@ import ru.mguschin.restapiserver.controller.RegistrationController;
 
 public class SimpleWebServer {
     private static final Logger logger = LoggerFactory.getLogger(SimpleWebServer.class);
-    //private final RequestMap requestMap;
     private final int KEEPALIVE_TIME = 10;
 
     private final ExecutorService pool;
@@ -24,9 +23,6 @@ public class SimpleWebServer {
     public SimpleWebServer(int port, int minWorkers, int maxWorkers) {
         listenPort = port;
         pool = new ThreadPoolExecutor(minWorkers, maxWorkers, KEEPALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingDeque<>());
-
-        //requestMap = RequestMap.getInstance();
-        //requestMap.addMapping("/register", (r) -> RegistrationController.register(r));
     }
 
     public void start () {
