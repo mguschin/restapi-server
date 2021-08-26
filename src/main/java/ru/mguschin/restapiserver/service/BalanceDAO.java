@@ -21,6 +21,8 @@ public class BalanceDAO {
 
             ResultSet rs = pst.executeQuery();
 
+            con.commit();
+            
             if (rs.next()) {
 
                 return rs.getLong(1);
