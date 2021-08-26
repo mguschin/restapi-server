@@ -33,14 +33,17 @@ public class BalanceController {
         String clientLogin = null;
 
         if (matcher.find()) {
-            clientLogin = matcher.group();
-        }
-        // validate
-        if (clientLogin == null || request.getHeader("X-Client-Token") == null || !request.getHeader("X-Client-Token").isEmpty()) {
-            return new HttpResponse(HttpStatus.UNAUTHORIZED);
+            clientLogin = matcher.group(1);
         }
 
         logger.debug("Balance data: login={} token={}", clientLogin, request.getHeader("X-Client-Token"));
+
+        // validate
+        if (clientLogin == null || request.getHeader("X-Client-Token") == null || request.getHeader("X-Client-Token").isEmpty()) {
+            return new HttpResponse(HttpStatus.UNAUTHORIZED);
+        }
+
+
         // pass to service
         Long clientBalance = null;
 
